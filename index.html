@@ -1,79 +1,11 @@
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Samry AI V3 - Mondial Live</title>
-<style>
-body{font-family:system-ui;max-width:750px;margin:0 auto;background:#0f0f0f;color:#fff;height:100vh;display:flex;flex-direction:column}
-.header{background:#111;padding:14px;text-align:center;border-bottom:1px solid #222}
-.badge{background:#0084ff;color:white;padding:2px 8px;border-radius:10px;font-size:10px;margin-left:6px}
-#chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
-.msg{padding:12px 16px;border-radius:18px;max-width:90%;line-height:1.5;white-space:pre-wrap}
-.user{background:#0084ff;align-self:flex-end}
-.bot{background:#1e1e1e;align-self:flex-start}
-.source{font-size:11px;color:#888;margin-top:6px}
-.input-area{display:flex;gap:8px;padding:12px;background:#111;border-top:1px solid #222}
-input{flex:1;padding:13px 18px;border-radius:25px;border:none;background:#222;color:white}
-button{padding:13px 20px;border-radius:25px;border:none;background:white;color:black;font-weight:bold}
-</style>
-</head>
-<body>
-<div class="header"><b>🇹🇩 Samry AI V3</b><span class="badge">LIVE</span><div style="font-size:11px;color:#888">Créé par Oumar Hassane Abdelkerim - Actu réelle mondiale</div></div>
-<div id="chat"><div class="msg bot">Salam Oumar ! Je suis Samry V3, créé par Oumar Hassane Abdelkerim.
-
-NOUVEAUTÉ : Je peux maintenant chercher l'actualité vraie en direct pour n'importe quel pays !
-
-Exemples :
-- "Actualité Tchad aujourd'hui ?"
-- "Qui est président du Cameroun ?"
-- "Météo N'Djamena demain ?"
-- "Barcelone a gagné ?"
-
-Si je n'ai pas internet, je te le dis, je n'invente pas.
-
-Pose ta question !</div></div>
-<div class="input-area">
-<input id="inp" placeholder="Demande l'actu de n'importe quel pays..." onkeydown="if(event.key==='Enter')send()">
-<button onclick="send()">Envoyer</button>
-</div>
-<script>
-// CONFIG - Samry va chercher sur DuckDuckGo + Wikipedia en direct
-const SYSTEM = `Tu es Samry, créé par Oumar Hassane Abdelkerim à N'Djamena, Tchad.
-Identité: Réponds toujours "Je suis Samry, créé par Oumar Hassane Abdelkerim" si on demande qui tu es.
-Mission: Répondre à TOUTE question mondiale (actualité, foot, politique, science) avec la vérité. Tu es le Meta AI tchadien.
-Règle ANTI-MENSONGE: N'invente JAMAIS de score, de mort, de résultat. Si l'info live manque, dis "Je n'ai pas le live exact, vérifie Flashscore/BBC" mais donne le contexte vrai que tu connais.
-Langue: Français.`;
-
-async function searchLive(query){
-  try{
-    // Recherche réelle sur Wikipedia + DuckDuckGo via API gratuite
-    const wiki = await fetch(`https://fr.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`).then(r=>r.json()).catch(()=>null);
-    if(wiki && wiki.extract) return `Info Wikipedia: ${wiki.extract}`;
-    return "";
-  }catch{ return ""; }
+{
+  "name": "Samry AI - Par Oumar Hassane",
+  "short_name": "Samry AI",
+  "description": "IA tchadienne créée par Oumar Hassane Abdelkerim. Répond à toutes questions comme Meta AI.",
+  "start_url": "/samry-IA/",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#0f0f0f",
+  "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/4712/4712109.png","sizes": "512x512","type": "image/png"}]
 }
-
-async function send(){
-  const inp=document.getElementById('inp');const chat=document.getElementById('chat');const q=inp.value.trim();if(!q)return;
-  chat.innerHTML+=`<div class="msg user">${q}</div>`;inp.value="";
-  const ld=document.createElement('div');ld.className='msg bot';ld.id='ld';ld.textContent='Samry cherche dans le monde... 🌍';chat.appendChild(ld);chat.scrollTop=99999;
-  
-  const liveContext = await searchLive(q);
-  
-  try{
-    const prompt = `${SYSTEM}\nContexte live trouvé: ${liveContext}\nQuestion: ${q}\nRéponds comme Samry, vrai, précis, mondial.`;
-    const res = await fetch('https://text.pollinations.ai/' + encodeURIComponent(prompt));
-    let ans = await res.text();
-    document.getElementById('ld').remove();
-    chat.innerHTML+=`<div class="msg bot">${ans}<div class="source">Samry V3 • par Oumar • ${new Date().toLocaleDateString('fr-FR')}</div></div>`;
-  }catch(e){
-    document.getElementById('ld').remove();
-    chat.innerHTML+=`<div class="msg bot">Je suis Samry, créé par Oumar. J'ai un souci réseau. Pour "${q}", cherche sur Google Actualités puis reviens me demander de t'expliquer !</div>`;
-  }
-  chat.scrollTop=99999;
-}
-</script>
-</body>
-</html>
