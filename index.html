@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samry AI</title>
+<script src="https://js.puter.com/v2/"></script>
+<style>
+body{font-family:sans-serif;padding:15px;background:#f0f2f5;margin:0}
+#chat{height:65vh;overflow:auto;background:white;padding:15px;border-radius:12px;box-shadow:0 2px 5px #ccc}
+.msg{margin:8px 0;padding:10px 14px;border-radius:18px;max-width:85%;word-wrap:break-word}
+.user{background:#0084ff;color:white;margin-left:auto}
+.ai{background:#e4e6eb}
+.bar{display:flex;gap:8px;margin-top:10px}
+input{flex:1;padding:13px;border-radius:25px;border:1px solid #ccc}
+button{padding:13px 20px;background:#0084ff;color:white;border:none;border-radius:25px}
+</style>
+</head>
+<body>
+<h2>🇹🇩 Samry AI - Comme Meta AI</h2>
+<div id="chat">
+<div class="msg ai">Salam Oumar ! Je suis Samry AI. Je parle toutes les langues et je réponds à TOUT, même l'actualité du 31 octobre 2026. Pose ta question !</div>
+</div>
+<div class="bar">
+<input id="q" placeholder="Écris ici...">
+<button onclick="ask()">Envoyer</button>
+</div>
+
+<script>
+const SYSTEM = `Tu es Samry AI, créé par Oumar au Tchad pour les PME tchadiennes.
+Tu parles TOUTES les langues (français, arabe, anglais, arabe tchadien, sara, gorane, etc). Détecte la langue de l'utilisateur et réponds DANS SA LANGUE.
+Tu réponds à TOUT comme Meta AI: actualités du 31 octobre 2026, météo, science, maths, histoire, conseils de vie, business.
+Tu connais aussi la gestion de boutique: stock, dettes, prix, clients.
+Sois bref, amical, utile. Date du jour: 31 octobre 2026.`;
+
+async function ask(){
+ let input=document.getElementById('q');
+ let question=input.value;
+ if(!question) return;
+ let chat=document.getElementById('chat');
+ chat.innerHTML+=`<div class="msg user">${question}</div>`;
+ input.value='';
+ chat.scrollTop=chat.scrollHeight;
+ chat.innerHTML+=`<div id="temp" class="msg ai">Samry réfléchit...</div>`;
+
+ try{
+  let response = await puter.ai.chat([
+    {role:"system", content: SYSTEM},
+    {role:"user", content: question}
+  ], {model:"meta-llama/llama-3.3-70b-instruct"});
+  document.getElementById('temp').remove();
+  chat.innerHTML+=`<div class="msg ai">${response.message.content.replace(/\n/g,'<br>')}</div>`;
+ } catch(e){
+  document.getElementById('temp').remove();
+  chat.innerHTML+=`<div class="msg ai">Erreur: ${e.message}. Réessaie.</div>`;
+ }
+ chat.scrollTop=chat.scrollHeight;
+}
+document.getElementById('q').addEventListener('keypress', e=>{ if(e.key==='Enter') ask(); });
+</script>
+</body>
+</html>
