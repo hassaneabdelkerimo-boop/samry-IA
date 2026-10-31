@@ -1,82 +1,39 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Samry AI - Comme Meta AI</title>
+<title>Samry AI</title>
 <style>
 body{font-family:system-ui;max-width:650px;margin:0 auto;padding:0;background:#f0f2f5;height:100vh;display:flex;flex-direction:column}
-.header{background:#0084ff;color:white;padding:16px;text-align:center;font-weight:bold;font-size:18px}
+.header{background:#0084ff;color:white;padding:16px;text-align:center;font-weight:bold}
 #chat{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:12px}
-.msg{padding:12px 16px;border-radius:18px;max-width:85%;line-height:1.4}
+.msg{padding:12px 16px;border-radius:18px;max-width:85%}
 .user{background:#0084ff;color:white;align-self:flex-end}
-.bot{background:white;align-self:flex-start;box-shadow:0 1px 3px rgba(0,0,0,.1)}
-.input-area{display:flex;gap:8px;padding:12px;background:white;border-top:1px solid #ddd}
-input{flex:1;padding:12px 15px;border-radius:25px;border:1px solid #ccc;outline:none}
-button{padding:12px 22px;border-radius:25px;border:none;background:#0084ff;color:white;font-weight:bold}
-.loading{font-style:italic;color:#666}
+.bot{background:white;align-self:flex-start}
+.input-area{display:flex;gap:8px;padding:12px;background:white}
+input{flex:1;padding:12px;border-radius:25px;border:1px solid #ccc}
+button{padding:12px 20px;border-radius:25px;border:none;background:#0084ff;color:white;font-weight:bold}
 </style>
 </head>
 <body>
-<div class="header">🇹🇩 Samry AI - Comme Meta AI</div>
-<div id="chat">
-<div class="msg bot">Salam Oumar ! Je suis Samry AI. Je parle toutes les langues et je réponds à TOUT (culture, devoirs, code, Islam, Tchad, actu du 31 Octobre 2026). Je ne devine JAMAIS les scores. Pose ta question !</div>
-</div>
+<div class="header">🇹🇩 Samry AI - Vrai Scores</div>
+<div id="chat"><div class="msg bot">Salam ! Aujourd'hui 31 Oct 2026. Barça-Alavés 21h. Pose ta question !</div></div>
 <div class="input-area">
 <input id="inp" placeholder="Écris ici..." onkeydown="if(event.key==='Enter')send()">
 <button onclick="send()">Envoyer</button>
 </div>
-
 <script>
-const TODAY = "Samedi 31 Octobre 2026";
-const TRUTH = `
-DATE DU JOUR: ${TODAY}
-MATCHS VRAIS AUJOURD'HUI (ne jamais inventer d'autres):
-- Barcelone vs Alavés à 21h00 WAT (LaLiga)
-- AC Milan vs Inter Milan 20h45 (Derby)
-- Bayern Munich vs Borussia Dortmund 18h30
-- Chelsea vs Manchester United 13h30
-- Man City vs Brighton 16h, Tottenham vs Crystal Palace 18h30, Aston Villa vs Fulham 21h
-- Levante vs Atletico Madrid 14h, Real Betis vs Malaga 17h30
-REGLE ANTI-MENSONGE: Si on te demande un score passé que tu ne connais pas, dis "Je n'ai pas le score vérifié, regarde sur LiveScore". N'INVENTE JAMAIS 2-1, 1-0 etc.
-STYLE: Réponds en français simple, fraternel, comme un grand frère tchadien. Tu es Samry AI.
-`;
-
+const BASE="DATE: Samedi 31 Oct 2026. MATCHS: Barcelone-Alavés 21h, AC Milan-Inter 20h45, Bayern-Dortmund 18h30. REGLE: N'invente JAMAIS de score.";
 async function send(){
-  const inp = document.getElementById('inp');
-  const chat = document.getElementById('chat');
-  const q = inp.value.trim();
-  if(!q) return;
-  chat.innerHTML += `<div class="msg user">${q}</div>`;
-  inp.value = "";
-  const loadId = "load"+Date.now();
-  chat.innerHTML += `<div class="msg bot loading" id="${loadId}">Samry écrit...</div>`;
-  chat.scrollTop = chat.scrollHeight;
-
-  const fullPrompt = `${TRUTH}\n\nQuestion de l'utilisateur: ${q}\n\nRéponds de façon utile, vraie, courte. Si c'est sur le foot d'aujourd'hui, utilise les matchs vrais ci-dessus.`;
-
+  const inp=document.getElementById('inp');const chat=document.getElementById('chat');const q=inp.value.trim();if(!q)return;
+  chat.innerHTML+=`<div class="msg user">${q}</div>`;inp.value="";
+  chat.innerHTML+=`<div class="msg bot" id="ld">...</div>`;chat.scrollTop=9999;
   try{
-    const res = await fetch('https://text.pollinations.ai/'+encodeURIComponent(fullPrompt), {method:'GET'});
-    let answer = await res.text();
-    // Sécurité: si l'IA hallucine encore un score inventé
-    if(q.toLowerCase().includes('clasico') && q.includes('25') && answer.includes('2-1')){
-        answer = "Pour le Clasico du 25/10/2026, je n'ai pas le score vérifié en direct pour ne pas te tromper Oumar. Vérifie sur LiveScore ou FlashScore s'il te plaît. Je ne veux plus inventer.";
-    }
-    document.getElementById(loadId).remove();
-    chat.innerHTML += `<div class="msg bot">${answer}</div>`;
-  }catch(e){
-    document.getElementById(loadId).remove();
-    // Fallback local si internet coupe
-    let fallback = "";
-    if(q.toLowerCase().includes('barcelone')){
-      fallback = "Aujourd'hui 31 Octobre 2026, Barcelone joue contre Alavés à 21h00 heure de N'Djamena !";
-    }else{
-      fallback = "Salam Oumar, petite coupure internet. Repose ta question, je suis là ! Aujourd'hui on est le 31 Octobre 2026.";
-    }
-    chat.innerHTML += `<div class="msg bot">${fallback}</div>`;
-  }
-  chat.scrollTop = chat.scrollHeight;
+    const r=await fetch('https://text.pollinations.ai/'+encodeURIComponent(BASE+" Q: "+q));const a=await r.text();
+    document.getElementById('ld').remove();chat.innerHTML+=`<div class="msg bot">${a}</div>`;
+  }catch(e){document.getElementById('ld').remove();chat.innerHTML+=`<div class="msg bot">Barça vs Alavés à 21h aujourd'hui !</div>`;}
+  chat.scrollTop=9999;
 }
 </script>
 </body>
